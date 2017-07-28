@@ -1,6 +1,6 @@
 {
   "name": "who-do-it",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "well-formatted & traceable log data producer.",
   "main": "lib",
   "scripts": {

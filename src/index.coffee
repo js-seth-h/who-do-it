@@ -16,6 +16,11 @@ moment = require 'moment'
 
 
 ###
+inspect = (val)-> JSON.stringify(val, null, 2) 
+if (typeof process isnt 'undefined') and (process.release.name is 'node') 
+  util = require 'util'
+  inspect = (val)->
+    util.inspect val, showHidden: false, depth: 10
 
 _isString = (obj)->
   typeof obj == 'string' || obj instanceof String
@@ -71,7 +76,7 @@ DUMPERS = [
 ,
   test: (val)-> _isObject val
   toJsonML: (key, val)-> 
-    return [ 'var', {name: key, type: "object"},  JSON.stringify(val, null, 2) ] 
+    return [ 'var', {name: key, type: "object"},  inspect(val) ] 
 ,
   test: (val)-> true
   toJsonML: (key, val)-> 
