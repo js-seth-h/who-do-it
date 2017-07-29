@@ -52,7 +52,7 @@ STRIZERS = [
   toJsonML: (val, inx)->
     return Object.prototype.toString.call val 
 , 
-  test: (val)-> val is null
+  test: (val)-> val is null or val is undefined
   toJsonML: (val)->
     return String(val) 
 ,
