@@ -51,14 +51,16 @@ STRIZERS = [
   test: (val)-> _isFunction val
   toJsonML: (val, inx)->
     return Object.prototype.toString.call val 
-, 
-  test: (val)-> val is null or val is undefined
-  toJsonML: (val)->
-    return String(val) 
+# , 
+#   test: (val)-> val is null or val is undefined
+#   toJsonML: (val)->
+#     return String(val) 
 ,
   test: (val)-> true
   toJsonML: (val)-> 
-    if val.toString?
+    unless val
+      str = String val
+    else if val.toString?
       str = val.toString()
     else
       str = Object.prototype.toString.call val
@@ -76,11 +78,13 @@ DUMPERS = [
 ,
   test: (val)-> _isObject val
   toJsonML: (key, val)-> 
-    return [ 'var', {name: key, type: "object"},  inspect(val) ] 
+    return [ 'var', {name: key, type: "object"},  inspect(val) ]  
 ,
   test: (val)-> true
   toJsonML: (key, val)-> 
-    if val.toString?
+    unless val
+      str = String val
+    else if val.toString?
       str = val.toString()
     else
       str = Object.prototype.toString.call val
