@@ -40,7 +40,7 @@ STRIZERS = [
   toJsonML: (val)->
     return [ 'text', val.getAttr(), val.toString() ] 
 , 
-  test: (val)-> val.toISOString?
+  test: (val)-> val?.toISOString?
   toJsonML: (val, inx)->
     return val.toISOString()
 ,
