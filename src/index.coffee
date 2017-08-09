@@ -2,26 +2,6 @@ moment = require 'moment'
 
 debug = require('debug')('ver2')
 
-if !Array::find
-  Array::find = (predicate) ->
-    'use strict'
-    if this is null
-      throw new TypeError('Array.prototype.find called on null or undefined')
-    if typeof predicate != 'function'
-      throw new TypeError('predicate must be a function')
-    list = Object(this)
-    length = list.length >>> 0
-    thisArg = arguments[1]
-    value = undefined
-    i = 0
-    while i < length
-      value = list[i]
-      if predicate.call(thisArg, value, i, list)
-        return value
-      i++
-    return undefined
-
-
 
 inspect = (val)-> JSON.stringify(val, null, 2)
 if (typeof process isnt 'undefined') and (process.release.name is 'node')
@@ -137,25 +117,34 @@ class _ML
       @childs.unshift @attrs
       @attrs = null
 
+    @_json_ml = null
     # debug '_ML', @attrs, @childs
 
+  add: (args...)->
+    args.map (val)=>
+      @childs.push val
+    @_json_ml = null
 
   toJsonML: ()->
+    if @_json_ml
+      return @_json_ml
     jsonML = [@tag]
     jsonML.push @attrs if @attrs
-    @childs.forEach (val)=>
-      fmt = MLizers.find (fmt)-> fmt.test val
-      if fmt
-        ml = fmt.toJsonML val 
+    @childs.forEach (val)->
+    # for i, val in @childs
+      inx = MLizers.findIndex (item)-> item.test val
+      lizer = MLizers[inx]
+      if lizer
+        ml = lizer.toJsonML val 
       else 
         ml = Object.prototype.toString.call val
-      # debug 'MLizers', val, 'to', ml, 'by', fmt.toJsonML.toString()
+      # debug 'MLizers', val, 'to', ml, 'by', item.toJsonML.toString()
       jsonML.push ml
+    @_json_ml = jsonML
     return jsonML
 
   toString: ()->
-    ml = @toJsonML()
-
+    ml = @toJsonML() 
     _str = (ml_node)->
       txts = []
       ml_node[1...].forEach (child)->
@@ -187,9 +176,11 @@ class _LogStmt extends _ML
     @_dump = {}
 
   do: (args...)->
-    args.map (val)=>
-      @childs.push val
+    @add args...
     return this
+    # args.map (val)=>
+    #   @childs.push val
+    # return this
 
   it: (obj)->
     for own key, val of obj
@@ -197,16 +188,19 @@ class _LogStmt extends _ML
     return this
 
   toJsonML: ()->
+    if @_json_ml
+      return @_json_ml
     jsonML = super()
     Object.keys(@_dump).forEach (key)=>
       val = @_dump[key]
-      fmt = DUMPERS.find (fmt)-> fmt.test val
-      if fmt
-        dump_str = fmt.toDumpStr val
+      inx = DUMPERS.findIndex (item)-> item.test val
+      dumper = DUMPERS[inx]
+      if dumper
+        dump_str = dumper.toDumpStr val
       else 
         dump_str = Object.prototype.toString.call val      
-      # ml = fmt.toJsonML key, val
-      jsonML.push ['dump', {name: key, type: fmt.type}, dump_str ]
+      # ml = dumper.toJsonML key, val
+      jsonML.push ['dump', {name: key, type: dumper.type}, dump_str ]
 
     return jsonML
 
