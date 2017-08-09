@@ -25,10 +25,11 @@
     "url": "https://github.com/js-seth-h/who-do-it/issues"
   },
   "homepage": "https://github.com/js-seth-h/who-do-it",
-  "dependencies": { 
+  "dependencies": {
     "moment": "^2.18.1"
   },
   "devDependencies": {
-    "coffee-script": "^1.7.1"
+    "coffee-script": "^1.7.1",
+    "debug": "^3.0.0"
   }
 }
