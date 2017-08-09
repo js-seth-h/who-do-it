@@ -138,6 +138,15 @@ class _ML
       jsonML.push ml
     return jsonML
 
+  attr: (obj)->
+    @attrs = {} unless @attrs
+    for own key, val of obj
+      @attrs[key] = val
+    return this
+
+  getAttr: (key)->
+    return @attrs[key]
+
   # toJsonML: ()->
   #   json_ml = [ @tag ]  
 
@@ -149,15 +158,6 @@ class _ML
   #     fmt = _.find DUMPERS, (fmt)-> fmt.test val 
   #     json_ml.push fmt.toJsonML val 
   #   return json_ml 
-
-  attr: (obj)->
-    @attrs = {} unless @attrs
-    for own key, val of obj
-      @attrs[key] = val
-    return this
-
-  getAttr: (key)->
-    return @attrs[key]
 
 
 
@@ -191,29 +191,12 @@ class _Who extends _ML
 
   sub: (sub_str = undefined)->
     sub_str = _randomScopeName() unless sub_str
-    new who @childs..., sub_str
+    new _Who @childs..., sub_str
     
-
-
-class _Who 
-  constructor: (@ns...) -> 
-    if @ns.length is 0 
-      @ns.push _randomScopeName()
-    @_str = @ns.join(':')
-    @_json_ml = ['who', @ns...]
-
-  sub: (sub_str = undefined)->
-    sub_str = _randomScopeName() unless sub_str
-    return new _Who @ns..., sub_str 
-
-  do: (strs...)->
-    log = new _LogStmt
-    log.who this
-    log.do strs...
+  do: (childs...)->
+    log = new _LogStmt this, childs...
     return log
-  toString : ()-> @_str
-  toJsonML : ()-> @_json_ml
-
+ 
 
 Who = (args...)-> 
   return new _Who args...

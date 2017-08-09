@@ -89,3 +89,44 @@ describe 'Typed toJsonML', ()->
     expect ml
       .toEqual ['text', Object.prototype.toString.call f  ]  
     done()
+
+describe 'complex', ()->
+  it 'nested text', (done)->
+    s = Text 'type', 'a text', Text {color:'red'}, 'emphasized', 'red'
+    ml = s.toJsonML() 
+    debug 'nested text', ml
+    expect ml
+      .toEqual ['text', 'type', 'a text', ['text', {color:'red'}, 'emphasized','red']]
+    done()
+
+  it 'from who', (done)-> 
+    w = Who 'my-name'
+    w = w.sub 'x'
+    s = w.do 'type', 'a text', Text {color:'red'}, 'emphasized', 'red'
+    ml = s.toJsonML() 
+    debug 'from who', ml
+    expect ml[2]
+      .toEqual ['who', 'my-name', 'x']
+    expect ml[3...]
+      .toEqual ['type', 'a text', ['text', {color:'red'}, 'emphasized','red']]
+    done()
+
+
+describe 'not purposed... but, working', ()->
+  it 'who with attr', (done)-> 
+    s = Who {color: 'red'}, 'my-name'
+    ml = s.toJsonML() 
+    debug 'who with attr', ml
+    expect ml
+      .toEqual ['who', {color: 'red'}, 'my-name']
+    done()
+
+  it 'who, set attr later', (done)-> 
+    s = Who 'my-name'
+    debug 's=', s
+    s.attr color: 'red'
+    ml = s.toJsonML() 
+    debug 'who with attr', ml
+    expect ml
+      .toEqual ['who', {color: 'red'}, 'my-name']
+    done()
