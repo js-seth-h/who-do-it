@@ -2,7 +2,7 @@ moment = require 'moment'
 
 debug = require('debug')('ver2')
 
-if !Array::find 
+if !Array::find
   Array::find = (predicate) ->
     'use strict'
     if this is null
@@ -20,11 +20,11 @@ if !Array::find
         return value
       i++
     return undefined
- 
 
 
-inspect = (val)-> JSON.stringify(val, null, 2) 
-if (typeof process isnt 'undefined') and (process.release.name is 'node') 
+
+inspect = (val)-> JSON.stringify(val, null, 2)
+if (typeof process isnt 'undefined') and (process.release.name is 'node')
   util = require 'util'
   inspect = (val)->
     util.inspect val, showHidden: false, depth: 10
@@ -38,7 +38,7 @@ _isArray = Array.isArray or (obj) ->
 _isFunction = (obj)->
   Object.prototype.toString.call(obj) is '[object Function]'
 _isObject = (obj)->
-  return !!(typeof obj is 'object' and obj isnt null) 
+  return !!(typeof obj is 'object' and obj isnt null)
 _isPlainObject= (obj)->
   return obj != null and typeof obj == 'object' and Object.getPrototypeOf(obj) == Object.prototype
 
@@ -54,17 +54,17 @@ _randomScopeName = (size = 4)->
   return result
 
 ###
-반환되는 것은 [tag, attr, childs...] 이거나  string 
+반환되는 것은 [tag, attr, childs...] 이거나  string
 ###
-MLizer = [  
-  test: (val)-> 
+MLizers = [
+  test: (val)->
     # if val
     #   debug 'test has toJsonML',val, val.toJsonML
     return val?.toJsonML?
   toJsonML: (val)->
-    return val.toJsonML() # [ 'text', val.getAttr(), val.toString() ] 
-, 
-  test: (val)-> 
+    return val.toJsonML() # [ 'text', val.getAttr(), val.toString() ]
+,
+  test: (val)->
     # if val
     #   debug 'test is date',val, val.toISOString
     return val?.toISOString?
@@ -77,17 +77,17 @@ MLizer = [
 ,
   test: (val)-> _isFunction val
   toJsonML: (val, inx)->
-    Object.prototype.toString.call val  
+    Object.prototype.toString.call val
 ,
   test: (val)-> true
-  toJsonML: (val)-> 
+  toJsonML: (val)->
     unless val # null, undefined, false, '', 0 ...
       str = String val
     else if val.toString?
       str = val.toString()
     else
       str = Object.prototype.toString.call val
-    return str 
+    return str
 
 ]
 
@@ -96,28 +96,28 @@ DUMPERS = [
   test: (val)-> _isError val
   toDumpStr: (val)->
     val.stack.toString()
-  # toJsonML: (key, val)-> 
+  # toJsonML: (key, val)->
   #   return [ 'dump', {name: key, type: "error"},  val.stack.toString() ]
 ,
   type: 'function'
   test: (val)-> _isFunction val
   toDumpStr: (val)->
-    val.toString()  
-  # toJsonML: (key, val)-> 
+    val.toString()
+  # toJsonML: (key, val)->
   #   return [ 'dump', {name: key, type: "function"},  val.toString() ]
 ,
   type: 'object'
   test: (val)-> _isObject val
   toDumpStr: (val)->
     inspect val
-  # toJsonML: (key, val)-> 
-  #   return [ 'dump', {name: key, type: "object"},  inspect(val) ]  
+  # toJsonML: (key, val)->
+  #   return [ 'dump', {name: key, type: "object"},  inspect(val) ]
 ,
   type: undefined
   # type: 'string'
   test: (val)-> true
   toDumpStr: (val)->
-  # toJsonML: (key, val)-> 
+  # toJsonML: (key, val)->
     unless val
       str = String val
     else if val.toString?
@@ -143,14 +143,14 @@ class _ML
   toJsonML: ()->
     jsonML = [@tag]
     jsonML.push @attrs if @attrs
-    @childs.forEach (val)=> 
-      fmt = MLizer.find (fmt)-> fmt.test val 
-      ml = fmt.toJsonML val    
-      # debug 'MLizer', val, 'to', ml, 'by', fmt.toJsonML.toString()
+    @childs.forEach (val)=>
+      fmt = MLizers.find (fmt)-> fmt.test val
+      ml = fmt.toJsonML val
+      # debug 'MLizers', val, 'to', ml, 'by', fmt.toJsonML.toString()
       jsonML.push ml
     return jsonML
 
-  toString: ()-> 
+  toString: ()->
     ml = @toJsonML()
 
     _str = (ml_node)->
@@ -172,22 +172,10 @@ class _ML
   getAttr: (key)->
     return @attrs[key]
 
-  # toJsonML: ()->
-  #   json_ml = [ @tag ]  
-
-  #   _.forEach @_do, (val)->
-  #     fmt = _.find MLizer, (fmt)-> fmt.test val 
-  #     json_ml.push fmt.toJsonML val 
-
-  #   _.forEach @_dump, (value, key)->
-  #     fmt = _.find DUMPERS, (fmt)-> fmt.test val 
-  #     json_ml.push fmt.toJsonML val 
-  #   return json_ml 
-
 
 
 class _LogStmt extends _ML
-  constructor: (args...)-> 
+  constructor: (args...)->
     super args...
     @tag = 'log_stmt'
     @attr
@@ -207,11 +195,11 @@ class _LogStmt extends _ML
 
   toJsonML: ()->
     jsonML = super()
-    Object.keys(@_dump).forEach (key)=> 
+    Object.keys(@_dump).forEach (key)=>
       val = @_dump[key]
-      fmt = DUMPERS.find (fmt)-> fmt.test val 
-      dump_str = fmt.toDumpStr val      
-      # ml = fmt.toJsonML key, val    
+      fmt = DUMPERS.find (fmt)-> fmt.test val
+      dump_str = fmt.toDumpStr val
+      # ml = fmt.toJsonML key, val
       jsonML.push ['dump', {name: key, type: fmt.type}, dump_str ]
 
     return jsonML
@@ -221,22 +209,22 @@ class _LogStmt extends _ML
     return this
 
 class _Who extends _ML
-  constructor: (args...)-> 
+  constructor: (args...)->
     super args...
     @tag = 'who'
 
   sub: (sub_str = undefined)->
     sub_str = _randomScopeName() unless sub_str
     new _Who @childs..., sub_str
-    
+
   do: (childs...)->
     log = new _LogStmt this, childs...
     return log
- 
 
-Who = (args...)-> 
+
+Who = (args...)->
   return new _Who args...
-LogStmt = (args...)-> 
+LogStmt = (args...)->
   return new _LogStmt args...
 
 Text = (args...)->
@@ -245,4 +233,7 @@ Text = (args...)->
 module.exports =
   Who: Who
   LogStmt: LogStmt
-  Text: Text 
+  Text: Text
+
+  MLizers: MLizers
+  Dumpers: DUMPERS
