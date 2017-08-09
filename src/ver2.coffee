@@ -95,15 +95,15 @@ DUMPERS = [
 
   test: (val)-> _isError val
   toJsonML: (key, val)-> 
-    return [ 'var', {name: key, type: "error"},  val.stack.toString() ]
+    return [ 'dump', {name: key, type: "error"},  val.stack.toString() ]
 ,
   test: (val)-> _isFunction val
   toJsonML: (key, val)-> 
-    return [ 'var', {name: key, type: "function"},  val.toString() ]
+    return [ 'dump', {name: key, type: "function"},  val.toString() ]
 ,
   test: (val)-> _isObject val
   toJsonML: (key, val)-> 
-    return [ 'var', {name: key, type: "object"},  inspect(val) ]  
+    return [ 'dump', {name: key, type: "object"},  inspect(val) ]  
 ,
   test: (val)-> true
   toJsonML: (key, val)-> 
@@ -113,7 +113,7 @@ DUMPERS = [
       str = val.toString()
     else
       str = Object.prototype.toString.call val
-    return ['var', {name: key}, str]
+    return ['dump', {name: key}, str]
 ]
 
 
@@ -137,6 +137,9 @@ class _ML
       # debug 'MLizer', val, 'to', ml, 'by', fmt.toJsonML.toString()
       jsonML.push ml
     return jsonML
+
+  toString: ()->
+
 
   attr: (obj)->
     @attrs = {} unless @attrs
@@ -179,6 +182,16 @@ class _LogStmt extends _ML
     for own key, val of obj
       @_dump[key] = val
     return this
+
+  toJsonML: ()->
+    jsonML = super()
+    Object.keys(@_dump).forEach (key)=> 
+      val = @_dump[key]
+      fmt = DUMPERS.find (fmt)-> fmt.test val 
+      ml = fmt.toJsonML key, val    
+      jsonML.push ml
+
+    return jsonML
 
   flush: (fn)->
     fn this.toJsonML()
