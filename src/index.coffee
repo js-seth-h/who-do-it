@@ -145,7 +145,10 @@ class _ML
     jsonML.push @attrs if @attrs
     @childs.forEach (val)=>
       fmt = MLizers.find (fmt)-> fmt.test val
-      ml = fmt.toJsonML val
+      if fmt
+        ml = fmt.toJsonML val 
+      else 
+        ml = Object.prototype.toString.call val
       # debug 'MLizers', val, 'to', ml, 'by', fmt.toJsonML.toString()
       jsonML.push ml
     return jsonML
@@ -198,7 +201,10 @@ class _LogStmt extends _ML
     Object.keys(@_dump).forEach (key)=>
       val = @_dump[key]
       fmt = DUMPERS.find (fmt)-> fmt.test val
-      dump_str = fmt.toDumpStr val
+      if fmt
+        dump_str = fmt.toDumpStr val
+      else 
+        dump_str = Object.prototype.toString.call val      
       # ml = fmt.toJsonML key, val
       jsonML.push ['dump', {name: key, type: fmt.type}, dump_str ]
 
