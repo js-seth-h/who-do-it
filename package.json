@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/js-seth-h/epic-log.git"
+    "url": "git://github.com/js-seth-h/who-do-it.git"
   },
   "keywords": [
     "log",
@@ -22,9 +22,9 @@
   "author": "js.seth.h@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/js-seth-h/epic-log/issues"
+    "url": "https://github.com/js-seth-h/who-do-it/issues"
   },
-  "homepage": "https://github.com/js-seth-h/epic-log",
+  "homepage": "https://github.com/js-seth-h/who-do-it",
   "dependencies": { 
     "moment": "^2.18.1"
   },
