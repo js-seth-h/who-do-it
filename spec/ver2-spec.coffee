@@ -1,5 +1,5 @@
 process.env.DEBUG = "*"
-{Who,LogStmt, Text } = require '../src/ver2'
+{Who,LogStmt, Text } = require '../src/index'
 assert = require 'assert'
 util = require 'util'
 
