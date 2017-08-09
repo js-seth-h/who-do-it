@@ -192,6 +192,18 @@ describe 'complex', ()->
       .toEqual ['dump', {name: 'c'}, 'true' ]
     done()
 
+describe 'toString', ()->
+  it 'stringify', (done)->
+    w = Who 'Jim'
+    s = w.do 'write obj.'
+          .it obj: {name:'this is object'}
+    ml = s.toJsonML()
+    str = s.toString()
+    debug 'stringify', str
+    expect str
+      .toEqual "Jim write obj. { name: 'this is object' }" 
+    done()
+
 
 
 describe 'not purposed... but, working', ()->

@@ -92,28 +92,40 @@ MLizer = [
 ]
 
 DUMPERS = [
-
+  type: 'error'
   test: (val)-> _isError val
-  toJsonML: (key, val)-> 
-    return [ 'dump', {name: key, type: "error"},  val.stack.toString() ]
+  toDumpStr: (val)->
+    val.stack.toString()
+  # toJsonML: (key, val)-> 
+  #   return [ 'dump', {name: key, type: "error"},  val.stack.toString() ]
 ,
+  type: 'function'
   test: (val)-> _isFunction val
-  toJsonML: (key, val)-> 
-    return [ 'dump', {name: key, type: "function"},  val.toString() ]
+  toDumpStr: (val)->
+    val.toString()  
+  # toJsonML: (key, val)-> 
+  #   return [ 'dump', {name: key, type: "function"},  val.toString() ]
 ,
+  type: 'object'
   test: (val)-> _isObject val
-  toJsonML: (key, val)-> 
-    return [ 'dump', {name: key, type: "object"},  inspect(val) ]  
+  toDumpStr: (val)->
+    inspect val
+  # toJsonML: (key, val)-> 
+  #   return [ 'dump', {name: key, type: "object"},  inspect(val) ]  
 ,
+  type: undefined
+  # type: 'string'
   test: (val)-> true
-  toJsonML: (key, val)-> 
+  toDumpStr: (val)->
+  # toJsonML: (key, val)-> 
     unless val
       str = String val
     else if val.toString?
       str = val.toString()
     else
       str = Object.prototype.toString.call val
-    return ['dump', {name: key}, str]
+    return str
+    # return ['dump', {name: key}, str]
 ]
 
 
@@ -138,7 +150,17 @@ class _ML
       jsonML.push ml
     return jsonML
 
-  toString: ()->
+  toString: ()-> 
+    ml = @toJsonML()
+
+    _str = (ml_node)->
+      txts = []
+      ml_node[1...].forEach (child)->
+        return if _isPlainObject child
+        return txts.push _str(child) if _isArray child
+        txts.push child
+      txts.join ' '
+    _str ml
 
 
   attr: (obj)->
@@ -188,8 +210,9 @@ class _LogStmt extends _ML
     Object.keys(@_dump).forEach (key)=> 
       val = @_dump[key]
       fmt = DUMPERS.find (fmt)-> fmt.test val 
-      ml = fmt.toJsonML key, val    
-      jsonML.push ml
+      dump_str = fmt.toDumpStr val      
+      # ml = fmt.toJsonML key, val    
+      jsonML.push ['dump', {name: key, type: fmt.type}, dump_str ]
 
     return jsonML
 
