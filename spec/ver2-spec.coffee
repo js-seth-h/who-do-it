@@ -6,7 +6,7 @@ util = require 'util'
 
 debug = require('debug')('test')
 
-describe 'simple ML', ()->
+describe 'simple toJsonML', ()->
   it 'who ', (done)-> 
     w = Who 'my-name'
     ml = w.toJsonML() 
@@ -42,4 +42,50 @@ describe 'simple ML', ()->
     ml = s.toJsonML() 
     expect ml
       .toEqual ['text', 'type', 'a text']
+    done()
+
+describe 'Typed toJsonML', ()->
+  it 'literals', (done)->
+    s = Text null, undefined, 0, 1, false
+    ml = s.toJsonML() 
+    expect ml
+      .toEqual ['text', 'null', 'undefined', '0', '1', 'false']
+    done()
+
+  it 'date', (done)->
+    d = new Date()
+    moment = require 'moment'
+    m = moment()
+    s = Text d, m 
+    ml = s.toJsonML() 
+    expect ml
+      .toEqual ['text', ['date', d.toISOString()] , ['date', m.toISOString()] ]
+    done()
+
+  it 'function', (done)->
+    f = (x)-> x * x
+    s = Text f
+    ml = s.toJsonML() 
+    debug 'function', ml
+    expect ml
+      .toEqual ['text', Object.prototype.toString.call f  ]  
+    done()
+
+  it 'array', (done)->
+    f = [1,2,3,4]
+    s = Text f
+    ml = s.toJsonML() 
+    debug 'array', ml
+    expect ml
+      .toEqual ['text', Object.prototype.toString.call f  ]  
+    done()
+
+  it 'Object', (done)->
+    class X 
+    f = new X
+    s = Text f
+    ml = s.toJsonML() 
+    debug 'Object', ml
+    expect ml
+      .toEqual ['text', Object.prototype.toString.call f  ]  
     done()

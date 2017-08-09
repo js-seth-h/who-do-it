@@ -39,6 +39,9 @@ _isFunction = (obj)->
   Object.prototype.toString.call(obj) is '[object Function]'
 _isObject = (obj)->
   return !!(typeof obj is 'object' and obj isnt null) 
+_isPlainObject= (obj)->
+  return obj != null and typeof obj == 'object' and Object.getPrototypeOf(obj) == Object.prototype
+
 _isError = (obj)->
   return obj instanceof Error
 
@@ -54,11 +57,17 @@ _randomScopeName = (size = 4)->
 반환되는 것은 [tag, attr, childs...] 이거나  string 
 ###
 MLizer = [  
-  test: (val)-> val?.toJsonML?
+  test: (val)-> 
+    # if val
+    #   debug 'test has toJsonML',val, val.toJsonML
+    return val?.toJsonML?
   toJsonML: (val)->
     return val.toJsonML() # [ 'text', val.getAttr(), val.toString() ] 
 , 
-  test: (val)-> val?.toISOString?
+  test: (val)-> 
+    # if val
+    #   debug 'test is date',val, val.toISOString
+    return val?.toISOString?
   toJsonML: (val, inx)->
     return [ 'date',  val.toISOString()]
 ,
@@ -112,7 +121,7 @@ DUMPERS = [
 class _ML
   constructor: (@attrs, @childs...)->
     @tag = 'text'
-    if not _isObject @attrs
+    if not _isPlainObject @attrs
       @childs.unshift @attrs
       @attrs = null
 
