@@ -205,7 +205,10 @@ class _LogStmt extends _ML
       jsonML.push ['dump', {name: key, type: dumper.type}, dump_str ]
 
     return jsonML
-
+    
+  end: ()->
+    if WhoDoIt.write
+      WhoDoIt.write this.toJsonML()
   flush: (fn)->
     fn this.toJsonML()
     return this
@@ -232,8 +235,9 @@ LogStmt = (args...)->
 Text = (args...)->
   return new _ML args...
 
-module.exports =
+module.exports = WhoDoIt = 
   setProcessIdStr: (str)-> PROCESS_ID = str
+  write: null
   Who: Who
   LogStmt: LogStmt
   Text: Text
