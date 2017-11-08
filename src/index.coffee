@@ -2,6 +2,7 @@ moment = require 'moment'
 
 debug = require('debug')('ver2')
 
+PROCESS_ID = process.pid
 
 inspect = (val)-> JSON.stringify(val, null, 2)
 if (typeof process isnt 'undefined') and (process.release.name is 'node')
@@ -166,12 +167,13 @@ class _ML
 
 
 
+
 class _LogStmt extends _ML
   constructor: (args...)->
     super args...
     @tag = 'log_stmt'
     @attr
-      pid : process.pid
+      pid : PROCESS_ID
       when: moment().toISOString()
     @_dump = {}
 
@@ -231,6 +233,7 @@ Text = (args...)->
   return new _ML args...
 
 module.exports =
+  setProcessIdStr: (str)-> PROCESS_ID = str
   Who: Who
   LogStmt: LogStmt
   Text: Text
