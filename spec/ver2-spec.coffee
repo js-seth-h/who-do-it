@@ -44,6 +44,15 @@ describe 'simple toJsonML', ()->
       .toEqual ['text', 'type', 'a text']
     done()
 
+  it 'LogStmt endAttr', (done)->
+    s = LogStmt 'code', 'it' 
+    s.endAttr color: 'red'
+    ml = s.toJsonML() 
+    expect ml[2...]
+      .toEqual ['code', 'it']
+    expect ml[1].color
+      .toEqual 'red'
+    done()
 describe 'Typed toJsonML', ()->
   it 'literals', (done)->
     s = Text null, undefined, 0, 1, false

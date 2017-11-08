@@ -205,6 +205,10 @@ class _LogStmt extends _ML
       jsonML.push ['dump', {name: key, type: dumper.type}, dump_str ]
 
     return jsonML
+  
+  endAttr:(attr)->
+    @attr attr
+    @end()
     
   end: ()->
     if WhoDoIt.write
