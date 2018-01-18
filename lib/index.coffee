@@ -39,6 +39,42 @@ _isError = (obj)->
 
 GLOBAL_ATTR = {}
 
+DUMPERS = [
+  type: (val)-> 'error'
+  test: (val)-> _isError val
+  toDumpStr: (val)->
+    val.stack.toString()
+,
+  type: (val)-> typeof val
+  test: (val)-> _isFunction val
+  toDumpStr: (val)->
+    val.toString()
+,
+  type: (val)-> 'date'
+  test: (val)-> val instanceof Date
+  toDumpStr: (val)->
+    val.toJSON()
+,
+  type: (val)-> typeof val
+  test: (val)-> _isObject val
+  toDumpStr: (val)->
+    inspect val
+,
+  type: (val)-> typeof val
+  test: (val)-> true
+  toDumpStr: (val)->
+    unless val
+      str = String val
+    else if val.toString?
+      str = val.toString()
+    else
+      str = Object.prototype.toString.call val
+    return str
+]
+
+
+
+
 class Meta
   constructor: (@attrs)->
 
@@ -55,7 +91,17 @@ _normalize = (arr)->
         childs.push createVar k, val
     else
       childs. push word
-  return ['testimony', attrs, childs...]
+  dumps = []
+  if attrs.dump is true
+    vars = childs.filter (ml)-> ml[0] is 'variable'
+    dumps = vars.map (ml)->
+      val = ml[1].ref 
+      dumper = DUMPERS.find (item)-> item.test val
+      type = dumper.type(val)
+      dump_str = dumper.toDumpStr val
+      return ['dump', {name: ml[1].name, type: type}, dump_str ]
+
+  return ['testimony', attrs, childs..., dumps...]
 
 decorable = (fn)->
   fn.decor = (attr)->
@@ -67,7 +113,7 @@ decorable = (fn)->
 createID = (label)->
   return ['id', "@"+label]
 createVar = (varname, value)->
-  return ['variable', {ref : value} , '#'+ varname ]
+  return ['variable', {name: varname, ref : value} , '#'+ varname ]
 createText = (text, attrs)->
   return ['text', attrs, text]
 
