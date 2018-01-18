@@ -71,6 +71,22 @@ describe 'testify', ()->
       }, '#b']
     ]
 
+  it 'prepend', ()->
+
+    t = testify.prepend whodoit.ID('keygen'), 'system', whodoit.Text(9, color: 'red')
+    ml_arr = t 're-activate', whodoit.Meta lv: 8
+
+    delete ml_arr[1].when
+    expect(ml_arr).eql ['testimony',
+      {
+        lv: 8
+      },
+      ['id', '@keygen']
+      'system'
+      ['text', {color: 'red'}, '9']
+      're-activate'
+    ]
+
 
   it 'extend write', (done)->
     whodoit.write = (log_ml)->

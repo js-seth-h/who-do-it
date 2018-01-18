@@ -95,7 +95,7 @@ _normalize = (arr)->
   if attrs.dump is true
     vars = childs.filter (ml)-> ml[0] is 'variable'
     dumps = vars.map (ml)->
-      val = ml[1].ref 
+      val = ml[1].ref
       dumper = DUMPERS.find (item)-> item.test val
       type = dumper.type(val)
       dump_str = dumper.toDumpStr val
@@ -104,6 +104,11 @@ _normalize = (arr)->
   return ['testimony', attrs, childs..., dumps...]
 
 decorable = (fn)->
+  fn.prepend = (pres...)->
+    _pred_fn = (args...)->
+      fn pres..., args...
+    return decorable _pred_fn
+  fn.meta =
   fn.decor = (attr)->
     _decord_fn = (args...)->
       fn new Meta(attr), args...
@@ -115,7 +120,7 @@ createID = (label)->
 createVar = (varname, value)->
   return ['variable', {name: varname, ref : value} , '#'+ varname ]
 createText = (text, attrs)->
-  return ['text', attrs, text]
+  return ['text', attrs, text.toString()]
 
 testify = (args...)->
   # formating & flushing
