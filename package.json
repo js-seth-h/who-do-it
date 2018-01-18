@@ -1,6 +1,6 @@
 {
   "name": "who-do-it",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "traceable log producer  &amp; superset of debug",
   "main": "index.js",
   "scripts": {
