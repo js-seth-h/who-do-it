@@ -1,35 +1,26 @@
 {
   "name": "who-do-it",
-  "version": "1.2.7",
-  "description": "well-formatted & traceable log data producer.",
-  "main": "lib",
+  "version": "2.0.0",
+  "description": "traceable log producer  &amp; superset of debug",
+  "main": "index.js",
   "scripts": {
-    "build": "coffee -c -b -o lib src  ",
-    "clean": "rm -r lib",
-    "prepublish": "npm run-script build",
-    "postpublish": "npm run-script clean",
-    "test": "jasmine-node --coffee  --verbose spec"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/js-seth-h/who-do-it.git"
+    "url": "git+https://github.com/js-seth-h/who-do-it.git"
   },
-  "keywords": [
-    "log",
-    "whodunit",
-    "traceable"
-  ],
   "author": "js.seth.h@gmail.com",
-  "license": "MIT",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/js-seth-h/who-do-it/issues"
   },
-  "homepage": "https://github.com/js-seth-h/who-do-it",
+  "homepage": "https://github.com/js-seth-h/who-do-it#readme",
   "dependencies": {
-    "moment": "^2.18.1"
+    "debug": "^3.1.0",
+    "moment": "^2.20.1"
   },
   "devDependencies": {
-    "coffee-script": "^1.7.1",
-    "debug": "^3.0.0"
+    "coffeescript": "^2.1.1"
   }
 }

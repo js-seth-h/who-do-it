@@ -26,9 +26,7 @@ Thumbs.db
 obj/
 [Rr]elease*/
 _ReSharper*/
-[Tt]est[Rr]esult*
-test/
+[Tt]est[Rr]esult* 
 node_modules/
 
 log/
-lib/
