@@ -39,6 +39,17 @@ _isError = (obj)->
 
 GLOBAL_ATTR = {}
 
+_toText = (val)->
+  unless val
+    str = String val
+  else if val.toJSON?
+    str = val.toJSON()
+  else if val.toString?
+    str = val.toString()
+  else
+    str = Object.prototype.toString.call val
+  return str
+
 DUMPERS = [
   type: (val)-> 'error'
   test: (val)-> _isError val
@@ -62,17 +73,8 @@ DUMPERS = [
 ,
   type: (val)-> typeof val
   test: (val)-> true
-  toDumpStr: (val)->
-    unless val
-      str = String val
-    else if val.toString?
-      str = val.toString()
-    else
-      str = Object.prototype.toString.call val
-    return str
+  toDumpStr: _toText
 ]
-
-
 
 
 class Meta
@@ -83,14 +85,21 @@ _normalize = (arr)->
     when: moment().toISOString()
   Object.assign attrs, GLOBAL_ATTR
   childs = []
+  # debug '_normalize arr=', arr
   for word in arr
+    # debug '_normalize', word
     if word instanceof Meta
+      # debug '  as meta'
       Object.assign attrs, word.attrs
+    else if _isArray word
+      childs.push word
     else if _isPlainObject word
+      # debug '  as Var'
       for own k, val of word
         childs.push createVar k, val
     else
-      childs. push word
+      # debug '  as toText'
+      childs.push _toText word
   dumps = []
   if attrs.dump is true
     vars = childs.filter (ml)-> ml[0] is 'variable'
@@ -104,15 +113,14 @@ _normalize = (arr)->
   return ['testimony', attrs, childs..., dumps...]
 
 decorable = (fn)->
-  fn.prepend = (pres...)->
+  fn.prebind = (pres...)->
     _pred_fn = (args...)->
       fn pres..., args...
     return decorable _pred_fn
-  fn.meta =
-  fn.decor = (attr)->
-    _decord_fn = (args...)->
-      fn new Meta(attr), args...
-    return decorable _decord_fn
+  fn.meta = (attr)->
+    return fn.prebind new Meta(attr)
+  fn.dump = ()->
+    return fn.prebind new Meta(dump: true)
   return fn
 
 createID = (label)->
@@ -126,9 +134,9 @@ testify = (args...)->
   # formating & flushing
   ml_arr = _normalize args
   if !!DEBUG.load() and !!ml_arr[1].debug_ns
-    # console.log 'ml_arr[1].debug_ns', ml_arr[1].debug_ns
+    # debug 'ml_arr[1].debug_ns', ml_arr[1].debug_ns
     msg = convertString ml_arr
-    # console.log msg
+    # debug msg
     DEBUG(ml_arr[1].debug_ns) msg
 
   if whodoit.write

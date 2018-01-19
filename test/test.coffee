@@ -48,10 +48,51 @@ describe 'testify', ()->
       ['id', '@Writer']
     ]
 
+  it 'testify with all type', ()->
+    # Undefined	"undefined"
+    # Null	"object" (see below)
+    # Boolean	"boolean"
+    # Number	"number"
+    # String	"string"
+    # Symbol (new in ECMAScript 2015)	"symbol"
+    # Host object (provided by the JS environment)	Implementation-dependent
+    # Function object (implements [[Call]] in ECMA-262 terms)	"function"
+    # Any other object	"object"
+
+    class X
+      constructor: (@val = 'val')->
+    class V
+      constructor: (@val = 'val')->
+      toString: ()->
+        "class V(#{@val})"
+    date = new Date
+    ml_arr = testify undefined, null, true, Boolean(true), new Boolean(true), 1,
+      Number(2), new Number(3), 'str', new String('new string'), {}, {a:1},
+      new X(), new V(4), date
+    # console.log ml_arr
+    delete ml_arr[1].when
+    expect(ml_arr).eql ['testimony',
+      {
+      },
+      'undefined'
+      'null'
+      'true'
+      'true'
+      'true'
+      '1'
+      '2'
+      '3'
+      'str'
+      'new string'
+      ['variable', {name: 'a', ref: 1}, '#a']
+      "[object Object]"
+      'class V(4)'
+      date.toJSON()
+    ]
   it 'testify decorable to add meta data', ()->
     plan = 'test'
-    t = testify.decor lv: 9, debug_ns: 'test'
-    t = t.decor about:'BT'
+    t = testify.meta lv: 9, debug_ns: 'test'
+    t = t.meta about:'BT'
     ml_arr = t 'test', a: 1, b:2
 
     delete ml_arr[1].when
@@ -71,9 +112,9 @@ describe 'testify', ()->
       }, '#b']
     ]
 
-  it 'prepend', ()->
+  it 'prebind', ()->
 
-    t = testify.prepend whodoit.ID('keygen'), 'system', whodoit.Text(9, color: 'red')
+    t = testify.prebind whodoit.ID('keygen'), 'system', whodoit.Text(9, color: 'red')
     ml_arr = t 're-activate', whodoit.Meta lv: 8
 
     delete ml_arr[1].when
@@ -109,7 +150,7 @@ describe 'testify', ()->
 
   it 'dump', ()->
     plan = 'test'
-    dump = testify.decor dump: true
+    dump = testify.dump()
 
     dt = new Date
     fn = (a)-> alert 1
