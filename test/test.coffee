@@ -91,7 +91,7 @@ describe 'testify', ()->
     ]
   it 'testify decorable to add meta data', ()->
     plan = 'test'
-    t = testify.meta lv: 9, debug_ns: 'test'
+    t = testify.meta(lv: 9).debug 'test'
     t = t.meta about:'BT'
     ml_arr = t 'test', a: 1, b:2
 

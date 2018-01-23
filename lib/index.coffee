@@ -121,6 +121,8 @@ decorable = (fn)->
     return fn.prebind new Meta(attr)
   fn.dump = ()->
     return fn.prebind new Meta(dump: true)
+  fn.debug = (name_space)->
+    return fn.prebind new Meta(debug_ns: name_space)
   return fn
 
 createID = (label)->
@@ -134,19 +136,27 @@ testify = (args...)->
   # formating & flushing
   ml_arr = _normalize args
   if !!DEBUG.load() and !!ml_arr[1].debug_ns
-    # debug 'ml_arr[1].debug_ns', ml_arr[1].debug_ns
-    msg = convertString ml_arr
-    # debug msg
-    DEBUG(ml_arr[1].debug_ns) msg
+    printDebug ml_arr
 
   if whodoit.write
     whodoit.write ml_arr
   return ml_arr
 decorable testify
 
-convertString = (arr)->
-  childs = arr[2...]
-  strs = childs.map (ml_item)->
+printDebug = (ml_arr)->
+  attr = ml_arr[1]
+  childs = ml_arr[2...]
+  words = childs.filter (c)-> c[0] isnt 'dump'
+  msg = convertSentence words
+  # debug msg
+  DEBUG(attr.debug_ns) msg
+
+  vars = childs.filter (c)-> c[0] is 'variable'
+  for v in vars
+    DEBUG(attr.debug_ns) "  ", v[1].name, '=>', v[1].ref
+
+convertSentence = (words)->
+  strs = words.map (ml_item)->
     unless _isArray ml_item
       return ml_item
     start_inx = 1
