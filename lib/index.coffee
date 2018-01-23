@@ -148,12 +148,12 @@ printDebug = (ml_arr)->
   childs = ml_arr[2...]
   words = childs.filter (c)-> c[0] isnt 'dump'
   msg = convertSentence words
-  # debug msg
-  DEBUG(attr.debug_ns) msg
 
   vars = childs.filter (c)-> c[0] is 'variable'
-  for v in vars
-    DEBUG(attr.debug_ns) "  ", v[1].name, '=>', v[1].ref
+  vars = vars.map (v)-> ["\n", v[1].name, '=>', v[1].ref ]
+  vars = [].concat vars...
+
+  DEBUG(attr.debug_ns) msg, vars...
 
 convertSentence = (words)->
   strs = words.map (ml_item)->
