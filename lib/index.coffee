@@ -16,7 +16,7 @@ debug = DEBUG 'who-do-it'
 PROCESS_ID = undefined
 
 inspect = (val)-> JSON.stringify(val, null, 2)
-if (typeof process isnt 'undefined') and (process.release.name is 'node')
+if window? is false and process?.release.name is 'node'
   util = require 'util'
   inspect = (val)->
     util.inspect val, showHidden: false, depth: 10
