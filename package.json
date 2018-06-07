@@ -2,7 +2,7 @@
   "name": "who-do-it",
   "version": "2.1.0",
   "description": "traceable log producer  &amp; superset of debug",
-  "main": "index.js",
+  "main": "lib",
   "scripts": {
     "test": "mocha"
   },
